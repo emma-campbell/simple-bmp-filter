@@ -1,6 +1,12 @@
 # Simple BMP Filter
 
-A simple program for filtering BMP images! Implemented in C++ and built using cmake! 
+A simple program for filtering BMP images! Implemented in C++ and built using cmake! Using this program you
+can turn this:
+[[https://github.com/emma-campbell/simple-bmp-filter/blob/master/red_tele.bmp]]
+
+Into this!
+[[https://github.com/emma-campbell/simple-bmp-filter/blob/master/new_red_tele.bmp]]
+
 
 Let's look at the structure of the project
 
