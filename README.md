@@ -2,9 +2,11 @@
 
 A simple program for filtering BMP images! Implemented in C++ and built using cmake! Using this program you
 can turn this:
+
 ![unfiltered image](https://github.com/emma-campbell/simple-bmp-filter/blob/master/red_tele.bmp)
 
 Into this!
+
 ![filtered image](https://github.com/emma-campbell/simple-bmp-filter/blob/master/new_red_tele.bmp)
 
 
