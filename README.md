@@ -88,3 +88,8 @@ After running the previous command, if you look in the main directory you will f
 
 - [ ] Command line flags which allows you to chose the color for which you filter
 - [ ] Support for other BMP files (like 32bit) or other file types (JPEG, PNG, etc)
+
+
+## Contact Info
+Emma Campbell
+ecampb10@u.rochester.edu
