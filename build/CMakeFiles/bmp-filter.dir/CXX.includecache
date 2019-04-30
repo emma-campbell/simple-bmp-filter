@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/bmp.hpp
+string
+-
+vector
+-
+
+/Users/emma/coding/c-image-processing/src/bmp.cpp
+iostream
+-
+fstream
+-
+cstdlib
+-
+bmp.hpp
+/Users/emma/coding/c-image-processing/src/bmp.hpp
+
+/Users/emma/coding/c-image-processing/src/main.cpp
+iostream
+-
+fstream
+-
+vector
+-
+cmath
+-
+bmp.hpp
+/Users/emma/coding/c-image-processing/src/bmp.hpp
+bmp.cpp
+/Users/emma/coding/c-image-processing/src/bmp.cpp
+
