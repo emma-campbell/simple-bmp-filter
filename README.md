@@ -68,35 +68,38 @@ If you want to see the program in action, you're going to want to run `cprocess`
 
 ## Running the Program
 
-First, clone this directory using the command: 
+First, clone this directory using the command:
+
 ```bash
 git clone https://github.com/emma-campbell/simple-bmp-filter
 ```
 
 After that, change directories into `build` using the command:
+
 ```bash
 cd build
 ```
 
 Once you are there, you will be able to run the exectuable using the basic scheme
+
 ```bash
 ./bmp-filter <infile> <outfile>
 ```
+
 where `<infile>` is the relative path to the bmp image you wish to filter, and `<outfile>` is the location where you wish to save the filtered product.
 
 Or, if you wish to use the included examples:
+
 ```bash
 ./bmp-filter ../red_tele.bmp ../new_red_tele.bmp
 ```
 
-After running the previous command, if you look in the main directory you will find a new file `new_red_tele.bmp`, which contains the new filtered image. 
-
+After running the previous command, if you look in the main directory you will find a new file `new_red_tele.bmp`, which contains the new filtered image.
 
 ## Future Enhancements
 
 - [ ] Command line flags which allows you to chose the color for which you filter
 - [ ] Support for other BMP files (like 32bit) or other file types (JPEG, PNG, etc)
-
 
 ## Contact Info
 Emma Campbell

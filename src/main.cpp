@@ -24,77 +24,77 @@
 #include "bmp.hpp"
 #include "bmp.cpp"
 
+#define UNDEFINED 9999
 //HSV structure --> used for filtering process
 //it is simpler to convert to gray scale using HSV rather than RGB
-struct HSV {
-    double hue;
-    double saturation;
-    double value;
-};
+typedef struct{
+    double h;
+    double s;
+    double v;
+} HSV;
 
 //RGB structure --> used for the filtering process
 //used for returning all the values of hsv2rgb at once
-struct RGB {
+typedef struct {
     int r;
     int g;
     int b;
-};
+} RGB;
 
-/**
- * \brief returns the largest of three doubles
- * 
- * \param a first double
- * \param b second double
- * \param c third double
- * \return largest of a, b & c
- */ 
-double largest(double a, double b, double c) {
-    if (a > b) {
-        if (a > c) {
-            return a;
-        }
-        else {
-            return c;
-        }
-    }
-    else {
-        if (b > c) {
-            return b;
-        }
-        else {
-            return c;
-        }
-    }
-}
+// /**
+//  * \brief returns the largest of three doubles
+//  * 
+//  * \param a first double
+//  * \param b second double
+//  * \param c third double
+//  * \return largest of a, b & c
+//  */ 
+// double largest(double a, double b, double c) {
+//     if (a > b) {
+//         if (a > c) {
+//             return a;
+//         }
+//         else {
+//             return c;
+//         }
+//     }
+//     else {
+//         if (b > c) {
+//             return b;
+//         }
+//         else {
+//             return c;
+//         }
+//     }
+// }
 
-/**
- * \brief returns the smallest of three doubles
- * 
- * \param a first double
- * \param b second double
- * \param c third double
- * 
- * \return smallest between a, b, & c.
- */ 
-double smallest(double a, double b, double c) {
-    if (a < b) {
-        if (a < c) {
-            return a;
-        }
-        else {
-            return c;
-        }
-    }
-    else {
-        if (b < c) {
-            return b;
-        }
-        else {
-            return c;
-        }
-    }
-}
-
+// /**
+//  * \brief returns the smallest of three doubles
+//  * 
+//  * \param a first double
+//  * \param b second double
+//  * \param c third double
+//  * 
+//  * \return smallest between a, b, & c.
+//  */ 
+// double smallest(double a, double b, double c) {
+//     if (a < b) {
+//         if (a < c) {
+//             return a;
+//         }
+//         else {
+//             return c;
+//         }
+//     }
+//     else {
+//         if (b < c) {
+//             return b;
+//         }
+//         else {
+//             return c;
+//         }
+//     }
+// }
 
 /**
  * \brief converts an RGB color into an HSV color
@@ -103,57 +103,66 @@ double smallest(double a, double b, double c) {
  * \param g green value
  * \param b blue value
  * 
- * \returns struct HSV (hue, saturation, value)
+ * \returns HSV (hue, saturation, value)
  * 
- * The formula for this comes from the following link:
- * https://www.rapidtables.com/convert/color/rgb-to-hsv.html
+ * I found this awesome book online about computer graphics and just thought 
+ * I would pass along the link if interested...Has cool psuedocode for translation
+ * between color models if anyone finds it interesting
+ * https://link.springer.com/book/10.1007/b138805
+ * 
+ * The relevant psuedocode for this function is found on p. 303.
  * 
  * Vist the link above for a more in depth description of the formula.
  */
-struct HSV rgb2hsv(int r, int g, int b) {
-
-    double rPrime = 0.0, gPrime = 0.0, bPrime = 0.0, cMax = 0.0, cMin = 0.0, delta = 0.0;
-    double hue = 0.0, saturation = 0.0, value = 0.0;
-
-    rPrime = (double)((double)r / 255.0);
-    gPrime = (double)((double)g / 255.0);
-    bPrime = (double)((double)b / 255.0);
-
-    cMax = largest(rPrime, gPrime, bPrime);
-    cMin = smallest(rPrime, gPrime, bPrime);
-    delta = cMax - cMin;     // the difference between the strongest color, and the weakest color
-
-    if (delta == 0.0) {
-        hue = 0.0; //white or red (depending on saturation)
-    }
-    else {
-        if (cMax == rPrime) {
-            hue = 60 * (double)((int)((gPrime - bPrime) / delta) % 6);
-        }
-        else if (cMax == gPrime) {
-            hue = 60 * (((bPrime - rPrime) / delta) + 2);
-        }
-        else {
-            hue = 60 * (((rPrime - gPrime) / delta) + 4);
-        }
-    }
-
-    if (cMax != 0) {
-        saturation = (delta / cMax);
-    }
-    else {
-        saturation = 0.0;
-    }
-
-    value = cMax;
-
-    struct HSV h;
+HSV rgb2hsv(RGB in) {
     
-    h.hue = hue;
-    h.saturation = saturation;
-    h.value = value;
+    HSV out;
+    double min, max, delta;
 
-    return h;
+    min = in.r < in.g ? in.r : in.g;
+    min = min < in.b ? min : in.b;
+
+    max = in.r > in.g ? in.r : in.g;
+    max = max > in.b ? max : in.b;
+
+    out.v = max; // v
+    delta = max - min;
+    
+    if (delta < 0.00001) {
+        out.s = 0;
+        out.h = 0; // undefined, maybe nan?
+        return out;
+    }
+    
+    if (max > 0.0) {                          // NOTE: if Max is == 0, this divide would cause a crash
+        out.s = (delta / max); // s
+    }
+
+    else {
+        // if max is 0, then r = g = b = 0
+        // s = 0, h is undefined
+        out.s = 0.0;
+        out.h = NAN; // its now undefined
+        return out;
+    }
+
+    if (in.r >= max) {                   
+        out.h = (in.g - in.b) / delta; // between yellow & magenta
+    }
+    else if (in.g >= max) {
+        out.h = 2.0 + (in.b - in.r) / delta; // between cyan & yellow
+    }
+    else {
+        out.h = 4.0 + (in.r - in.g) / delta; // between magenta & cyan
+    }
+
+    out.h *= 60.0; // degrees
+
+    if (out.h < 0.0) {
+        out.h += 360.0;
+    }
+
+    return out;
 }
 
 /**
@@ -162,71 +171,73 @@ struct HSV rgb2hsv(int r, int g, int b) {
  * \param hsv HSV structure (hue, saturation, value)
  * \return RGB structure (red, green, blue)
  * 
- * The formula for this conversion is found here:
- * https://www.rapidtables.com/convert/color/hsv-to-rgb.html
+ * Again, the helpful psuedocode comes from: https://link.springer.com/book/10.1007/b138805
+ * More details for HSV -> RGB found on p. 304
  * 
  * See the link above for more in depth description of the formula
  */
-struct RGB hsv2rgb(struct HSV hsv) {
+RGB hsv2rgb(HSV in) {
     
-    double h = 0.0, s = 0.0, v = 0.0;  //hue, saturation, value (respectively)
-    double c = 0.0, x = 0.0, m = 0.0;
-    double rgb[3];
+    double hh, p, q, t, ff;
+    long i; 
+    RGB out;
 
-    h = hsv.hue;            //get hue
-    s = hsv.saturation;     //get saturation
-    v = hsv.value;          //get value
-
-    c = v * s;
-    x = c * (double)(1 - abs(((int)(h / 60) % 2) - 1.0));
-    m = v - c;
-
-    if (h >= 0 && h < 60) {
-        rgb[0] = c;
-        rgb[1] = x;
-        rgb[2] = 0.0;
-    }
-    else if (h >= 60 && h < 120) {
-        rgb[0] = x;
-        rgb[1] = c;
-        rgb[2] = 0.0;
-    }
-    else if (h >= 120 && h < 180) {
-        rgb[0] = 0.0;
-        rgb[1] = c;
-        rgb[2] = x;
-    }
-    else if (h >= 180 && h < 240) {
-        rgb[0] = 0;
-        rgb[1] = x;
-        rgb[2] = c;
-    }
-    else if (h >= 240 && h < 300) {
-        rgb[0] = x;
-        rgb[1] = 0.0;
-        rgb[2] = c;
-    }
-    else {
-        rgb[0] = c;
-        rgb[1] = 0.0;
-        rgb[2] = x;
+    if (in.s <= 0.0) {
+        out.r = in.v;
+        out.g = in.v;
+        out.b = in.v;
+        return out;
     }
 
-    BYTE red = ((rgb[0] + m) * 255);
-    BYTE green = ((rgb[1] + m) * 255);
-    BYTE blue = ((rgb[2] + m) * 255);
+    hh = in.h;
+    if (hh >= 360.0)
+        hh = 0.0;
+    hh /= 60.0;
+    i = (long)hh;
+    ff = hh - i;
+    p = in.v * (1.0 - in.s);
+    q = in.v * (1.0 - (in.s * ff));
+    t = in.v * (1.0 - (in.s * (1.0 - ff)));
 
-    RGB newrgb;
-    
-    newrgb.r = red;
-    newrgb.b = blue;
-    newrgb.g = green;
+    switch (i) {
+        case 0:
+            out.r = in.v;
+            out.g = t;
+            out.b = p;
+            break;
+        case 1:
+            out.r = q;
+            out.g = in.v;
+            out.b = p;
+            break;
+        case 2:
+            out.r = p;
+            out.g = in.v;
+            out.b = t;
+            break;
 
-    return newrgb; //return the HSV as a RGB
+        case 3:
+            out.r = p;
+            out.g = q;
+            out.b = in.v;
+            break;
+        case 4:
+            out.r = t;
+            out.g = p;
+            out.b = in.v;
+            break;
+        case 5:
+        default:
+            out.r = in.v;
+            out.g = p;
+            out.b = q;
+            break;
+        }
+    return out;
 }
 
 /**
- * \breif Performs the image filtering
+ * \brief Performs the image filtering
  * 
  * \param bmp Pixel matrix of an image
  * \return modified Pixel matrix (all grayscale except red colors)
@@ -242,25 +253,25 @@ struct RGB hsv2rgb(struct HSV hsv) {
 std::vector< std::vector<Pixel> > filter(std::vector< std::vector<Pixel> > bmp) {
     
     std::vector< std::vector<Pixel> > newBMP; //filtered matrix
-    struct RGB rgb;     //filtered temp pixel
+    RGB rgb;     //filtered temp pixel
 
     for (const auto &row : bmp) {
         std::vector<Pixel> temp;
         
         for (const auto &item : row) {
             Pixel p = item;
-            
-            int r = p.red;
-            int g = p.green;
-            int b = p.blue;
+
+            rgb.r = p.red;
+            rgb.g = p.green;
+            rgb.b = p.blue;
 
             //conversion to HSV
-            struct HSV h = rgb2hsv(r, g, b);
+            HSV h = rgb2hsv(rgb);
 
             //as specified by handout, red hue values generally lie between
             //-20 and 20 (also checks that it is not white)
-            if (!((h.hue >= -20.0 && h.hue <= 20.0) && h.saturation != 0)) {
-                h.saturation = 0;
+            if (h.h > 20.0 && h.h < 340.0) {
+                h.s = 0;
             }
 
             //convert back to RGB
